@@ -9,9 +9,6 @@ def check_dir(path):
 def mkpath(headfile = None,mainpath = None, positive = None, Negative = None):
     classes = [positive,Negative]
     AudioFolder = headfile
-    #if os.path.exists(AudioFolder) is False:
-        
-    
     part_ap = []
     check_dir(AudioFolder)
     if mainpath != None :
@@ -21,11 +18,10 @@ def mkpath(headfile = None,mainpath = None, positive = None, Negative = None):
         if positive != None and Negative != None:
             for i in classes:
                 target2 = os.path.join(target1,i)
-                check_dir(target2)
-                
+                check_dir(target2)  
                 part_ap.append(target2)
                 print(target2)
-    #x = glob('{}/**'.format(part_ap), recursive=True)
+
     return part_ap
 
 if __name__ == "__main__":

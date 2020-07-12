@@ -29,17 +29,11 @@ def checkFile(path):
 def mkdir_n_rec(headfile = None,mainpath = None, positive = None, Negative = None,printPositive = None,printNegative = None):
     mk = checkdir.mkpath(headfile,mainpath,positive,Negative)
     prt = [printPositive, printNegative]
-    # print('Pleace Say ',printPositive)    
-    # for _ in range(5):
-    #     RecordAudio.rec(mk[0])
-    # print('Pleace Say ',printNegative)    
-    # for _ in range(5):
-    #     RecordAudio.rec(mk[1])
     
     for i in range(2):
         for j in range(5):
-            print('Please Say ',prt[i])
-            time.sleep(0.5)
+            print('กรุณาพูดคำว่า ',prt[i])
+            time.sleep(0.25)
             RecordAudio.rec(mk[i])
 
 def splitAudio(src = None, dst = None):
@@ -80,11 +74,11 @@ def firsttime():
     print('[Make Directory] Running ... ')
     checkdir.mkpath('Model')
     print('[Make Directory] Directory Model is Created')
-    mkdir_n_rec('Audio','Help','True','False','Help !!!','Anything else')
+    mkdir_n_rec('Audio','Help','True','False','"ช่วยด้วย"','อะไรก็ได้ เช่น "อาบน้ำ" "น้ำไม่ไหล" เป็นต้น หรือ ไม่พูด')
     print('[Make Directory] Directory and Record Help is Created')
-    mkdir_n_rec('Audio','Confirm1','True','False','Yes','No')
+    mkdir_n_rec('Audio','Confirm1','True','False','"ใข่"','"ไม่ใช่"')
     print('[Make Directory] Directory and Record Confirm1 is Created')
-    mkdir_n_rec('Audio','Confirm2','True','False','Okey','Do not')
+    mkdir_n_rec('Audio','Confirm2','True','False','"โอเค"','"ไม่ต้อง"')
     print('[Make Directory] Directory and Record Confirm2 is Created')
     print('[Make Directory] Finished... ')
     #checkdir('Audio','rmSilenceHelp','True','False')
@@ -153,20 +147,8 @@ def start_predict():
 
 if __name__ == "__main__":
     x = checkFile('Model')
-    # #x = checkFile('Audio')
-    # #print(x)
     if x == False:
         firsttime()
         start_predict()
     else:
         start_predict()
-    # splitAudio('Audio/dataAugmentationHelp','Audio/cleanDataAug_Help')
-    # data_Generator('Audio/cleanDataAug_Help','Model/RNN_Help_Model.h5')
-        # for h in help_V:
-        #     for _ in range(5):
-        #         RecordAudio.rec(h)
-        #print(help_V)
-        #RecordAudio.rec(h for h in help_V)
-        #confirm1_V = checkdir.mkpath('Audio','Confirm1','True','False')
-        #confirm2_V = checkdir.mkpath('Audio','Confirm2','True','False')
-        #if 

@@ -12,15 +12,10 @@ import threading
 import time
 
 class SWHear(object):
-    """
-    The SWHear class is made to provide access to continuously recorded
-    (and mathematically processed) microphone data.
-    """
-    #model = load_model('modelRNN_v5.h5')
+    
 
     def __init__(self,device=None,startStreaming=True):
-        """fire up the SWHear class."""
-        print(" -- initializing SWHear")
+      
 
         self.chunk = 1024 # number of data points to read at a time
         self.rate = 16000 # time resolution of the recording device (Hz)
@@ -48,9 +43,7 @@ class SWHear(object):
         if startStreaming:
             self.stream_start()
     
-    ### LOWEST LEVEL AUDIO ACCESS
-    # pure access to microphone and stream operations
-    # keep math, plotting, FFT, etc out of here.
+
 
     def stream_read(self):
         """return values for a single chunk"""
@@ -77,38 +70,19 @@ class SWHear(object):
         self.stream_stop()
         self.p.terminate()
 
-    ### TAPE METHODS
-    # tape is like a circular magnetic ribbon of tape that's continously
-    # recorded and recorded over in a loop. self.tape contains this data.
-    # the newest data is always at the end. Don't modify data on the type,
-    # but rather do math on it (like FFT) as you read from it.
-
     def tape_add(self):
         """add a single chunk to the tape."""
         self.tape[:-self.chunk]=self.tape[self.chunk:]
         self.tape[-self.chunk:]=self.stream_read()
-        
-
-    # def tape_flush(self):
-    #     """completely fill tape with new data."""
-    #     readsInTape=int(self.rate*self.tapeLength/self.chunk)
-    #     print(" -- flushing %d s tape with %dx%.2f ms reads"%\
-    #               (self.tapeLength,readsInTape,self.chunk/self.rate))
-    #     for i in range(readsInTape):
-    #         self.tape_add()
 
     def tape_forever(self,plotSec=.25):
         t1=0
-        # print(self.tape)
+ 
         try:
             while True:
                 self.tape_add()
-                #self.predict()
-                #print(self.tape)
                 if (time.time()-t1)>plotSec:
-                    t1=time.time()
-                    #self.tape_plot()
-
+                    t1=time.time()                 
         except:
             print(" ~~ exception (keyboard?)")
             return
@@ -135,7 +109,8 @@ class SWHear(object):
         #self.tape_add()
         while True:
             pre = self.tape
-            print('predict help : ',pre)
+            #print('predict help : ',pre)
+            print('หากต้องการความช่วยเหลือกรุณาพูด "ช่วยด้วย" ')
             pre = pre.reshape(1,-1)
             score = self.model.predict(pre,verbose=1)
             label_index=np.argmax(score)
@@ -153,9 +128,10 @@ class SWHear(object):
                     time.sleep(1)
                     print('[start first confirm in 1s] ...')
                     time.sleep(1)
-                    print('Please say "Yes"')
+                    print('คุณต้องการความช่วยเหลือ "ใช่" หรือ "ไม่" ')
+                    time.sleep(2)
                     pre1 = self.tape
-                    print("predict yes or no : ",pre1)
+                    #print("predict yes or no : ",pre1)
                     pre1 = pre1.reshape(1,-1)
                     score1 = self.model_Confirm1.predict(pre1,verbose=1)
                     label_index1=np.argmax(score1)
@@ -173,9 +149,10 @@ class SWHear(object):
                             time.sleep(1)
                             print('[start second confirm in 1s] ...')
                             time.sleep(1)
-                            print('Please say "Okey"')
+                            print('กรุณาพูด "โอเค" เพื่อยืนยันการส่งข้อความแจ้งเตือน  หากไม่ต้องการ กรุณาพูด "ไม่ต้อง" ')
+                            time.sleep(2)
                             pre2 = self.tape
-                            print('predict okey or do not',pre2)
+                            #print('predict okey or do not',pre2)
                             pre2 = pre2.reshape(1,-1)
                             score2 = self.model_Confirm2.predict(pre2,verbose=1)
                             label_index2=np.argmax(score2)
@@ -192,99 +169,24 @@ class SWHear(object):
                     else :
                         self.predictConfirm01 = False
                         print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   No')
+                        time.sleep(1)      
 
             else :
                 self.predictHelp = False
                 print('>>>>>>>>>>>>>>>>>>>>>>>   No problem')
 
-    
-        
-        #time.sleep(0.1)
-
-    # def predictConfirm1(self):
-    #     #self.tape_add()
-        
-    #     while True:
-    #         #print('confirm 1 is runing')
-    #         if self.predictHelp == True :
-    #             print('[start first confirm in 3s] ...')
-    #             time.sleep(1)
-    #             print('[start first confirm in 2s] ...')
-    #             time.sleep(1)
-    #             print('[start first confirm in 1s] ...')
-    #             time.sleep(1)
-    #             print('Please say "Yes"')
-    #             pre1 = self.tape
-    #             #print(pre)
-    #             pre1 = pre1.reshape(1,-1)
-    #             score1 = self.model_Confirm1.predict(pre1,verbose=1)
-    #             label_index1=np.argmax(score1)
-    #             if label_index1 == 1 :
-    #                 self.predictConfirm01 = True
-    #                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   Yes')
-    #                 time.sleep(10)
-    #             else :
-    #                 self.predictConfirm01 = False
-    #                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   No')
-
-    # def predictConfirm2(self):
-    #     #self.tape_add()
-    #     while True:
-    #         #print('confirm 2 is runing')
-    #         if self.predictConfirm01 == True :
-    #             print('[start second confirm in 3s] ...')
-    #             time.sleep(1)
-    #             print('[start second confirm in 2s] ...')
-    #             time.sleep(1)
-    #             print('[start second confirm in 1s] ...')
-    #             time.sleep(1)
-    #             print('Please say "Okey"')
-    #             pre2 = self.tape
-    #             #print(pre)
-    #             pre2 = pre2.reshape(1,-1)
-    #             score2 = self.model_Confirm2.predict(pre2,verbose=1)
-    #             label_index2=np.argmax(score2)
-    #             if label_index2 == 1 :
-    #                 self.predictConfirm02 = True
-    #                 print('[sending messege] "Please Help"')
-    #                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   Okey')
-    #                 time.sleep(5)
-    #             else :
-    #                 self.predictConfirm02 = False 
-    #                 print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>   Do not')          
-
-    # def endprogram():
-    #     time.sleep(20)
-    #     sys.exit()
-
 
 if __name__=="__main__":
     ear=SWHear()
-    #ear.tape_forever()
-    # task1 = threading.Thread(target=ear.tape_forever)
-    # task2 = threading.Thread(target=ear.predict)
-
-    # task1.start()
-    # task2.start()
-
-    # task1.join()
-    # task2.join()
 
     task1 = threading.Thread(target=ear.tape_forever)
     task2 = threading.Thread(target=ear.predict)
-    # task3 = threading.Thread(target=ear.predictConfirm1)
-    # task4 = threading.Thread(target=ear.predictConfirm2)
-    
 
     task1.start()
     task2.start()
-    # task3.start()
-    # task4.start()
 
     task1.join()
     task2.join()
-    # task3.join()
-    # task4.join()
 
     ear.close()
     print("DONE")

@@ -18,91 +18,8 @@ import librosa
 import librosa.display
 import numpy as np
 
-# data=[]
-# labels=[]
-
-# data_positive = os.listdir('Data/CallForHelp')
-# data_negative = os.listdir('Data/NegativeData')
-# j = 0
-# # save_path = ['IMG_spectrogram/01.png',
-# #                 'IMG_spectrogram/02.png',
-# #                 'IMG_spectrogram/03.png',
-# #                 'IMG_spectrogram/04.png',
-# #                 'IMG_spectrogram/05.png']
-# # save_path_negative = ['IMG_spectrogram_negative/Negative01.png',
-# #                         'IMG_spectrogram_negative/Negative02.png',
-# #                         'IMG_spectrogram_negative/Negative03.png',
-# #                         'IMG_spectrogram_negative/Negative04.png']
-# for i in data_positive :
-#     s, r = librosa.load('Data/CallForHelp/'+i,sr=16000)
-#     data.append(s)
-    
-#     labels.append(1)
-    
-# for i in data_negative :
-#     sig, rate = librosa.load('Data/NegativeData/'+i,sr=16000)
-#     data.append(sig)
-#     labels.append(0)
-
-# data.reshape(1,-1)
-# print(len(data))
-# print(data)
-
-# print(len(labels))
-
-# print(labels)
-# print('---------------------------')
-# #print(r)
-# print(s.shape)
-# print(s)
-# print(len(s))
-
-# Cells = np.asarray(data)
-# labels = np.asarray(labels)
-# # newCells = tf.convert_to_tensor(Cells,dtype = tf.float32)
-# print(Cells)
-# # print('new Cells : ',newCells)
-# Cells.reshape(-1,1)
-# print('Cells : ',Cells)
-# #print('Cells shape : ',)
-# # np.save("newCells",Cells)
-# # np.save("newlabels",labels)
-
-# # Cells=np.load('newCells.npy')
-# # labels=np.load('newlabels.npy')
-
-# a=np.arange(Cells.shape[0])
-# np.random.shuffle(a)
-
-# Cells=Cells[a]
-# labels=labels[a]
-
-# num_classes=len(np.unique(labels))
-# len_data=len(Cells)
-
-# (x_train,x_test)=Cells[(int)(0.1*len_data):],Cells[:(int)(0.1*len_data)]
-# print(len_data)
-# print(Cells)
-
-# # x_train = x_train.astype('float32')/255 
-# # x_test = x_test.astype('float32')/255
-# train_len=len(x_train)
-# test_len=len(x_test)
-
-# (y_train,y_test)=labels[(int)(0.1*len_data):],labels[:(int)(0.1*len_data)]
-
-# print('y train :',y_train)
-# print('y test',y_test)
-# print('x test',x_test)
-# print(x_train.shape)
-# print(y_train.shape)
-# print('x train',x_train)
-# print('x train shape : ',x_train.shape[1:])
-
 def RNN_model(N_CLASSES=10, SR=16000, DT=1.0):
-    # nCategories = 2
-    # srate = 16000
-    # iLen = 160000
+
     rnn_func = L.LSTM
 
     inputs = L.Input(shape=(1,int(SR*DT)),name='input')
@@ -162,6 +79,8 @@ def RNN_model(N_CLASSES=10, SR=16000, DT=1.0):
     #             )
     # from keras.models import load_model
     # model.save('test_model_RNN.h5')
+
+    ##### OLD Version RNN Model  ##### 
 
     # i = L.Input(shape=(1,int(SR*DT)), name='input')
     # x = Melspectrogram(n_dft=512, n_hop=160, padding='same', sr=SR, n_mels=128, fmin=0.0, 
