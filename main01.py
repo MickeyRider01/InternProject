@@ -1,0 +1,172 @@
+import os
+from glob import glob
+import checkdir
+import RecordAudio
+import argparse
+import clean
+import removeSilence
+import NormalizeSound
+import DataAugmentation
+import DataGenerator
+import predict
+
+import threading
+import time
+
+def checkFile(path):
+    if os.path.exists(path) is True :
+        x = os.listdir(path)
+        if len(x) == 0:
+            print("don't have model")
+            return False
+        else:
+            print('have model')
+            print(len(x))
+            return True
+    else :
+        return False
+
+def mkdir_n_rec(headfile = None,mainpath = None, positive = None, Negative = None,printPositive = None,printNegative = None):
+    mk = checkdir.mkpath(headfile,mainpath,positive,Negative)
+    prt = [printPositive, printNegative]
+    # print('Pleace Say ',printPositive)    
+    # for _ in range(5):
+    #     RecordAudio.rec(mk[0])
+    # print('Pleace Say ',printNegative)    
+    # for _ in range(5):
+    #     RecordAudio.rec(mk[1])
+    
+    for i in range(2):
+        for j in range(5):
+            print('Please Say ',prt[i])
+            time.sleep(0.5)
+            RecordAudio.rec(mk[i])
+
+def splitAudio(src = None, dst = None):
+    parser = argparse.ArgumentParser(description='Cleaning audio data')
+    parser.add_argument('--src_root', type=str, default=src,
+                        help='directory of audio files in total duration')
+    parser.add_argument('--dst_root', type=str, default=dst,
+                        help='directory to put audio files split by delta_time')
+    parser.add_argument('--delta_time', '-dt', type=float, default=2.0,
+                        help='time in seconds to sample audio')
+    parser.add_argument('--sr', type=int, default=16000,
+                        help='rate to downsample audio')
+
+    parser.add_argument('--fn', type=str, default='3a3d0279',
+                        help='file to plot over time to check magnitude')
+    parser.add_argument('--threshold', type=str, default=20,
+                        help='threshold magnitude for np.int16 dtype')
+    args, _ = parser.parse_known_args()
+
+    #test_threshold(args)
+    clean.split_wavs(args)
+
+#def removeSL(path)
+
+def data_Generator(path=None, saveModelpath=None):
+    parser = argparse.ArgumentParser(description='Call for help Classification Training')
+    parser.add_argument('--model_type',type=str, default='RNN_model',help='model to run lstm')
+    parser.add_argument('--src_root',type=str,default=path)
+    parser.add_argument('--dst_root', type=str, default=saveModelpath,help='Model path')
+    parser.add_argument('--batch_size',type=int, default=32,help='batch_size')
+    parser.add_argument('--delta_time','-dt',type=float,default=2.0,help='time in seconds to sample audio')
+    parser.add_argument('--sample_rate','-sr',type=int,default=16000, help='sample rate')
+    args, _ = parser.parse_known_args()
+    DataGenerator.train(args)
+
+def firsttime():
+    print("don't have model ...")
+    print('[Make Directory] Running ... ')
+    checkdir.mkpath('Model')
+    print('[Make Directory] Directory Model is Created')
+    mkdir_n_rec('Audio','Help','True','False','Help !!!','Anything else')
+    print('[Make Directory] Directory and Record Help is Created')
+    mkdir_n_rec('Audio','Confirm1','True','False','Yes','No')
+    print('[Make Directory] Directory and Record Confirm1 is Created')
+    mkdir_n_rec('Audio','Confirm2','True','False','Okey','Do not')
+    print('[Make Directory] Directory and Record Confirm2 is Created')
+    print('[Make Directory] Finished... ')
+    #checkdir('Audio','rmSilenceHelp','True','False')
+
+    print('[Remove Silence in Audio] Running ... ')
+    removeSilence.rmSilence('Audio/Help','Audio/rmSilenceHelp')
+    removeSilence.rmSilence('Audio/Confirm1','Audio/rmSilenceConfirm1')
+    removeSilence.rmSilence('Audio/Confirm2','Audio/rmSilenceConfirm2')
+    print('[Remove Silence in Audio] Finished ... ')
+
+    print('[Normalize Audio] Running ... ')
+    NormalizeSound.normalizeAudio('Audio/rmSilenceHelp','Audio/normalizedHelp')
+    NormalizeSound.normalizeAudio('Audio/rmSilenceConfirm1','Audio/normalizedConfirm1')
+    NormalizeSound.normalizeAudio('Audio/rmSilenceConfirm2','Audio/normalizedConfirm2')
+    print('[Normalize Audio] Finished ... ')
+
+    print('[Split Audio] Running ... ')
+    splitAudio('Audio/normalizedHelp','Audio/cleanHelp')
+    splitAudio('Audio/normalizedConfirm1','Audio/cleanConfirm1')
+    splitAudio('Audio/normalizedConfirm2','Audio/cleanConfirm2')
+    print('[Split Audio] Finished ... ')
+
+    print('[Data Augmentation] Running ... ')
+    print('[Data Augmentation] Creating more Help Voice ... ')
+    DataAugmentation.dataAugmentation('Audio/cleanHelp','Audio/dataAugmentationHelp')
+    print('[Data Augmentation] Help Voice is Created... ')
+    print('[Data Augmentation] Creating more Confirm1 Voice ... ')
+    DataAugmentation.dataAugmentation('Audio/cleanConfirm1','Audio/dataAugmentationConfirm1')
+    print('[Data Augmentation] Confirm1 Voice is Created... ')
+    print('[Data Augmentation] Creating more Confirm2 Voice ... ')
+    DataAugmentation.dataAugmentation('Audio/cleanConfirm2','Audio/dataAugmentationConfirm2')
+    print('[Data Augmentation] Confirm2 Voice is Created... ')
+    print('[Data Augmentation] Finished ... ')
+
+    print('[Split Audio] Running ... ')
+    splitAudio('Audio/dataAugmentationHelp','Audio/cleanDataAug_Help')
+    splitAudio('Audio/dataAugmentationConfirm1','Audio/cleanDataAug_Confirm1')
+    splitAudio('Audio/dataAugmentationConfirm2','Audio/cleanDataAug_Confirm2')
+    print('[Split Audio] Finished ... ')
+
+    print('[Train Model] Running ... ')
+    print('[Train Model] Training Help Model ... ')
+    data_Generator('Audio/cleanDataAug_Help','Model/RNN_Help_Model.h5')
+    print('[Train Model] Training Confirm1 Model ... ')
+    data_Generator('Audio/cleanDataAug_Confirm1','Model/RNN_Confirm1_Model.h5')
+    print('[Train Model] Training Confirm2 Model ... ')
+    data_Generator('Audio/cleanDataAug_Confirm2','Model/RNN_Confirm2_Model.h5')
+    print('[Train Model] Finished ... ')
+
+def start_predict():
+    ear = predict.SWHear()
+
+    task1 = threading.Thread(target=ear.tape_forever)
+    task2 = threading.Thread(target=ear.predict)
+
+    task1.start()
+    task2.start()
+
+    task1.join()
+    task2.join()
+   
+    ear.close()
+    print("DONE")
+    
+
+
+if __name__ == "__main__":
+    x = checkFile('Model')
+    # #x = checkFile('Audio')
+    # #print(x)
+    if x == False:
+        firsttime()
+        start_predict()
+    else:
+        start_predict()
+    # splitAudio('Audio/dataAugmentationHelp','Audio/cleanDataAug_Help')
+    # data_Generator('Audio/cleanDataAug_Help','Model/RNN_Help_Model.h5')
+        # for h in help_V:
+        #     for _ in range(5):
+        #         RecordAudio.rec(h)
+        #print(help_V)
+        #RecordAudio.rec(h for h in help_V)
+        #confirm1_V = checkdir.mkpath('Audio','Confirm1','True','False')
+        #confirm2_V = checkdir.mkpath('Audio','Confirm2','True','False')
+        #if 
