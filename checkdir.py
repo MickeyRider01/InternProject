@@ -1,6 +1,6 @@
 import os
 from glob import glob
-
+# checkdir.py จะเป็นการเช็คไดเร็กทอรี่ และสร้างไดเร็กทอรี่ขึ้นมาหากไม่มี
 
 def check_dir(path):
     if os.path.exists(path) is False:

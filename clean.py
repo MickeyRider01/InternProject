@@ -23,7 +23,7 @@ def envelope(y, rate, threshold):
             mask.append(False)
     return mask, y_mean
 
-
+#ทำเป็น mono
 def downsample_mono(path, sr):
     rate, wav = wavfile.read(path)
     wav = wav.astype(np.float32, order='F')
@@ -49,15 +49,15 @@ def check_dir(path):
     if os.path.exists(path) is False:
         os.mkdir(path)
 
-
+#ตัดและเติมไฟล์ Audio
 def split_wavs(args):
     src_root = args.src_root
     dst_root = args.dst_root
     dt = args.delta_time
 
-    wav_paths = glob('{}/**'.format(src_root), recursive=True)
-    wav_paths = [x for x in wav_paths if '.wav' in x]
-    dirs = os.listdir(src_root)
+    # wav_paths = glob('{}/**'.format(src_root), recursive=True)
+    # wav_paths = [x for x in wav_paths if '.wav' in x]
+    # dirs = os.listdir(src_root)
     check_dir(dst_root)
     classes = os.listdir(src_root)
     for _cls in classes:
@@ -76,31 +76,34 @@ def split_wavs(args):
                 sample[:wav.shape[0]] = wav
                 save_sample(sample, rate, target_dir, fn, 0)
             else:
-                trunc = wav.shape[0] % delta_sample
-                for cnt, i in enumerate(np.arange(0, wav.shape[0]-trunc, delta_sample)):
-                    start = int(i)
-                    stop = int(i + delta_sample)
-                    sample = wav[start:stop]
-                    save_sample(sample, rate, target_dir, fn, cnt)
+                # trunc = wav.shape[0] % delta_sample
+                # for cnt, i in enumerate(np.arange(0, wav.shape[0]-trunc, delta_sample)):
+                #     start = int(i)
+                #     stop = int(i + delta_sample)
+                #     sample = wav[start:stop]
+                #     save_sample(sample, rate, target_dir, fn, cnt)
+                
+                sample = wav[0:delta_sample]# wav[start:stop]
+                save_sample(sample, rate, target_dir, fn, 0)
 
 
-def test_threshold(args):
-    src_root = args.src_root
-    wav_paths = glob('{}/**'.format(src_root), recursive=True)
-    wav_path = [x for x in wav_paths if args.fn in x]
-    if len(wav_path) != 1:
-        print('audio file not found for sub-string: {}'.format(args.fn))
-        return
-    rate, wav = downsample_mono(wav_path[0], args.sr)
-    mask, env = envelope(wav, rate, threshold=args.threshold)
-    plt.style.use('ggplot')
-    plt.title('Signal Envelope, Threshold = {}'.format(str(args.threshold)))
-    plt.plot(wav[np.logical_not(mask)], color='r', label='remove')
-    plt.plot(wav[mask], color='c', label='keep')
-    plt.plot(env, color='m', label='envelope')
-    plt.grid(False)
-    plt.legend(loc='best')
-    plt.show()
+# def test_threshold(args):
+#     src_root = args.src_root
+#     wav_paths = glob('{}/**'.format(src_root), recursive=True)
+#     wav_path = [x for x in wav_paths if args.fn in x]
+#     if len(wav_path) != 1:
+#         print('audio file not found for sub-string: {}'.format(args.fn))
+#         return
+#     rate, wav = downsample_mono(wav_path[0], args.sr)
+#     mask, env = envelope(wav, rate, threshold=args.threshold)
+#     plt.style.use('ggplot')
+#     plt.title('Signal Envelope, Threshold = {}'.format(str(args.threshold)))
+#     plt.plot(wav[np.logical_not(mask)], color='r', label='remove')
+#     plt.plot(wav[mask], color='c', label='keep')
+#     plt.plot(env, color='m', label='envelope')
+#     plt.grid(False)
+#     plt.legend(loc='best')
+#     plt.show()
 
 
 if __name__ == '__main__':
@@ -121,5 +124,5 @@ if __name__ == '__main__':
                         help='threshold magnitude for np.int16 dtype')
     args, _ = parser.parse_known_args()
 
-    test_threshold(args)
+    #test_threshold(args)
     split_wavs(args)

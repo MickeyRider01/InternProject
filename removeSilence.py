@@ -4,6 +4,7 @@ import os
 import checkdir
 from glob import glob
 
+# ฟังก์ชันที่ใช้ในการหาเสียงที่ไม่ใช่เสียงเงียบว่าอยู่ใน ms ที่เท่าไหร่
 def detect_leading_silence(sound, silence_threshold=-45.0, chunk_size=10):
 
     trim_ms = 0 # ms
@@ -13,7 +14,7 @@ def detect_leading_silence(sound, silence_threshold=-45.0, chunk_size=10):
         trim_ms += chunk_size
 
     return trim_ms
-
+# ฟังก์ชันที่ใช้ในการตัดเสียงเงียบออกไป จากการหาว่า ms ที่มีเสียงคือ ms ที่เท่าไหร่ หัว และท้ายไฟล์ Audio จากนั้นจะตัดส่วนนั้นมาบันทึก
 def rm(path, save_path):
     data = os.listdir(path)
     for i in data :
@@ -26,6 +27,7 @@ def rm(path, save_path):
         trimmed_sound = sound[start_trim:duration-end_trim]
         trimmed_sound.export(save_path+'/'+i, format="wav")
 
+# ฟังก์ชันที่ใช้เช็ก path ต่าง ๆ และสร้าง path เมื่อเรียกใช้ removeSilence.py จะเรียกกับฟังก์ชันนี้โปรแกรมจะทำงานทุกขั้นตอนของการลบเสียงเงียบ
 def rmSilence(path = None, save_path = None):
     data = os.listdir(path)
     wav_paths = glob('{}/**'.format(path), recursive=True)

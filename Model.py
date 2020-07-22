@@ -18,7 +18,8 @@ import librosa
 import librosa.display
 import numpy as np
 
-def RNN_model(N_CLASSES=10, SR=16000, DT=1.0):
+# ฟังก์ชันสร้างโมเดล RNN โดยมี input คือ จำนวน class ที่ต้องการจำแนก sampling rate ของไฟล์ audio และจำนวนเวลาของไฟล์ audio 
+def RNN_model(N_CLASSES=2, SR=16000, DT=2.0):
 
     rnn_func = L.LSTM
 

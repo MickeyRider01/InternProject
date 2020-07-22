@@ -16,6 +16,9 @@ from tqdm import tqdm
 from glob import glob
 import argparse
 
+#คลาส Generator ข้อมูล และฟังก์ชันในการเทรนข้อมูล 
+# Data Generator with keras 
+
 class DataGenerator(tf.keras.utils.Sequence):
     def __init__(self, wav_paths, labels, sr, dt, n_classes, batch_size=32, shuffle=True):
         self.wav_paths = wav_paths
@@ -49,7 +52,7 @@ class DataGenerator(tf.keras.utils.Sequence):
         if self.shuffle:
             np.random.shuffle(self.indexes)
 
-
+#ฟังก์ชันในการเทรนข้อมูล
 def train(args):
     src_root = args.src_root
     dst_root = args.dst_root
@@ -73,16 +76,15 @@ def train(args):
     wav_train, wav_val, label_train, label_val = train_test_split(wav_paths, labels, test_size=0.1, random_state=0)
 
     tg = DataGenerator(wav_train, label_train, sr, dt, len(set(label_train)),batch_size=batch_size)
-    print('------------')
-    print('tg : ',tg)
+    
     vg = DataGenerator(wav_val, label_val, sr, dt, len(set(label_val)), batch_size=batch_size)
-    print('vg : ',vg)
+    
     model = models[model_type]
     cp = ModelCheckpoint('model/{}.h5'.format(model_type), monitor='val_loss',
                             save_best_only = True, save_weights_only = False,
                             mode = 'auto', save_freq='epoch', verbose=1)
     
-    model.fit(tg, validation_data=vg, epochs = 2, verbose=1)
+    model.fit(tg, validation_data=vg, epochs = 2, verbose=1) # เพิ่ม-ลด Epochs โดยการเซ็ตค่าที่ epochs
     model.save(dst_root)
 
 if __name__ == '__main__':

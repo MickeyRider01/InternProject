@@ -20,7 +20,7 @@ data_st_ap = []
 data_cp_ap = []
 data_cs_ap = []
 
-
+#อ่านไฟล์ Audio
 def load_audio_file(file_path):
     data_l = os.listdir(file_path)
     input_length = 16000
@@ -39,13 +39,14 @@ def load_audio_file(file_path):
         x+=1
     return data_ap
 
-def plot_time_series(data):
-    fig = plt.figure(figsize=(14,8))
-    plt.title('Raw Wave')
-    plt.ylabel('Amplitude')
-    plt.plot(np.linspace(0, 1, len(data)), data)
-    plt.show()
+# def plot_time_series(data):
+#     fig = plt.figure(figsize=(14,8))
+#     plt.title('Raw Wave')
+#     plt.ylabel('Amplitude')
+#     plt.plot(np.linspace(0, 1, len(data)), data)
+#     plt.show()
 
+# ทำ Noise Injection
 def add_noise(data):
     for j in range(3):
         n_f = (j+1)*300
@@ -54,7 +55,7 @@ def add_noise(data):
         data_n_ap.append(data_wn)
     return data_n_ap
 
-
+# ทำ Shifting time
 def shifting_time(data):
     sampling_rate = 16000
     #shift_direction = 'both'
@@ -81,7 +82,7 @@ def shifting_time(data):
 
 
 
-
+# ทำ Changing Pitch
 def changing_pitch(data):
     sampling_rate = 16000
     for r_cp in range(3):
@@ -90,6 +91,7 @@ def changing_pitch(data):
         data_cp_ap.append(data_cp)
     return  data_cp_ap
 
+# ทำ Changing Speed
 def changing_speed(data):
     for r_cs in range(3):
         speed_factor = 1+((r_cs+1)*0.15)
@@ -98,7 +100,7 @@ def changing_speed(data):
     return data_cs_ap
 
 
-
+# ฟังก์ชันที่เรียกการทำงานฟังก์ชันต่าง ๆ
 def dataAug(path=None, save_path=None):
     load_audio_file(path+'/')
 
@@ -125,6 +127,7 @@ def dataAug(path=None, save_path=None):
         wavfile.write(save_path+'/'+str(count)+'.wav', 16000, new_i)
         count+=1
 
+# ฟังก์ชันที่ใช้เช็ก path และเซตค่าต่าง ๆ เพื่อให้ฟังก์ชันอื่นง่ายต่อการเรียกใช้ เวลาเรียกใช้ DataAugmentation.py จะเรียกกับฟังก์ชันนี้โปรแกรมจะทำงานทุกขั้นตอนของ Data Augmentation
 def dataAugmentation(path = None, save_path = None):
     data = os.listdir(path)
     checkdir.check_dir(save_path)

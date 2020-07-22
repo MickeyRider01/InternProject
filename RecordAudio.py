@@ -39,7 +39,7 @@ def rec(path):
     # Terminate the PortAudio interface
     p.terminate()
 
-    print('Finished recording')
+    print('Finished record')
 
     # Save the recorded data as a WAV file
     wf = wave.open(filename, 'wb')
