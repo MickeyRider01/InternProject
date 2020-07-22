@@ -27,7 +27,7 @@ def rm(path, save_path):
         trimmed_sound = sound[start_trim:duration-end_trim]
         trimmed_sound.export(save_path+'/'+i, format="wav")
 
-# ฟังก์ชันที่ใช้เช็ก path ต่าง ๆ และสร้าง path เมื่อเรียกใช้ removeSilence.py จะเรียกกับฟังก์ชันนี้โปรแกรมจะทำงานทุกขั้นตอนของการลบเสียงเงียบ
+# ฟังก์ชันที่ใช้เช็ก path ต่าง ๆ และสร้างไฟล์ให้ path ที่บันทึก เมื่อเรียกใช้ removeSilence.py จะเรียกกับฟังก์ชันนี้โปรแกรมจะทำงานทุกขั้นตอนของการลบเสียงเงียบ
 def rmSilence(path = None, save_path = None):
     data = os.listdir(path)
     wav_paths = glob('{}/**'.format(path), recursive=True)
